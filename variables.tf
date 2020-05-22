@@ -106,6 +106,12 @@ variable "lifecycle_rule" {
   default     = []
 }
 
+variable "replication_configuration" {
+  description = "Map containing cross-region replication configuration."
+  type        = any
+  default     = {}
+}
+
 variable "server_side_encryption_type" {
   description = "The server-side encryption algorithm to use. Valid values are AES256 and aws:kms"
   type        = string
