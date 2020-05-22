@@ -46,11 +46,20 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "logging" {
-    for_each = var.default_logging_enabled == "true" ? [local.default_logging_config] : [var.custom_logging_config]
+    for_each = var.default_logging_enabled == "true" ? [local.default_logging_config] : [v]
 
     content {
-      target_bucket = logging.value.target_bucket
-      target_prefix = lookup(logging.value, "target_prefix", null)
+      target_bucket = default_logging_config.value.target_bucket
+      target_prefix = lookup(default_logging_config.value, "target_prefix", null)
+    }
+  }
+
+  dynamic "logging" {
+    for_each = var.default_logging_enabled == "false" ? [local.custom_logging_config] : []
+
+    content {
+      target_bucket = custom_logging_config.value.target_bucket
+      target_prefix = lookup(custom_logging_config.value, "target_prefix", null)
     }
   }
 
