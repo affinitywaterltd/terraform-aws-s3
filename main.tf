@@ -38,14 +38,18 @@ resource "aws_s3_bucket" "this" {
       mfa_delete = var.versioning_mfa_delete
   }
 
-  dynamic "logging" {
-    for_each = length(keys(var.logging)) == 0 ? [] : [var.logging]
-
-    content {
-      target_bucket = logging.value.target_bucket
-      target_prefix = lookup(logging.value, "target_prefix", null)
+    logging {
+       target_bucket = null
+       target_prefix = null
     }
-  }
+#  dynamic "logging" {
+#    for_each = length(keys(var.logging)) == 0 ? [] : [var.logging]
+
+    #content {
+    #  target_bucket = logging.value.target_bucket
+    #  target_prefix = lookup(logging.value, "target_prefix", null)
+    #}
+  #}
 
   dynamic "lifecycle_rule" {
     for_each = var.lifecycle_rule
@@ -99,7 +103,7 @@ resource "aws_s3_bucket" "this" {
       }
     }
   }
-  
+
  # Max 1 block - replication_configuration
   dynamic "replication_configuration" {
     for_each = length(keys(var.replication_configuration)) == 0 ? [] : [var.replication_configuration]
