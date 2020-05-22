@@ -94,7 +94,19 @@ variable "versioning_mfa_delete" {
   default     = false
 }
 
-variable "logging" {
+variable "default_logging_enabled" {
+  description = "Determines if a default logging config is applied"
+  type        = bool
+  default     = false
+}
+
+variable "default_logging_bucket" {
+  description = "Defines bucket name for default logging configuration"
+  type        = string
+  default     = null
+}
+
+variable "custom_logging_config" {
   description = "Map containing access bucket logging configuration."
   type        = map(string)
   default     = {}

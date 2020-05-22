@@ -1,3 +1,10 @@
+locals {
+    default_logging_config = {
+        target_bucket = var.default_logging_bucket
+        target_prefix = "testprefix/"
+    }
+}
+
 resource "aws_s3_bucket" "this" {
   count = var.create_bucket ? 1 : 0
 
@@ -38,18 +45,14 @@ resource "aws_s3_bucket" "this" {
       mfa_delete = var.versioning_mfa_delete
   }
 
-    logging {
-       target_bucket = null
-       target_prefix = null
-    }
-#  dynamic "logging" {
-#    for_each = length(keys(var.logging)) == 0 ? [] : [var.logging]
+  dynamic "logging" {
+    for_each = var.default_logging_enabled == "true" ? [local.default_logging_config] : [var.custom_logging_config]
 
-    #content {
-    #  target_bucket = logging.value.target_bucket
-    #  target_prefix = lookup(logging.value, "target_prefix", null)
-    #}
-  #}
+    content {
+      target_bucket = logging.value.target_bucket
+      target_prefix = lookup(logging.value, "target_prefix", null)
+    }
+  }
 
   dynamic "lifecycle_rule" {
     for_each = var.lifecycle_rule
