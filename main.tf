@@ -105,7 +105,7 @@ resource "aws_s3_bucket" "this" {
     rule {
         apply_server_side_encryption_by_default {
             sse_algorithm     = var.server_side_encryption_type
-            kms_master_key_id = var.kms_master_key_id
+            kms_master_key_id = var.server_side_encryption_kms_key_id
         }
     }
   }
