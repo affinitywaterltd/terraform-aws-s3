@@ -94,10 +94,10 @@ variable "versioning_mfa_delete" {
   default     = false
 }
 
-variable "logging" {
-  description = "Map containing access bucket logging configuration."
-  type        = map(string)
-  default     = {}
+variable "logging_bucket" {
+  description = "Containing access bucket logging configuration."
+  type        = string
+  default     = null
 }
 
 variable "lifecycle_rule" {

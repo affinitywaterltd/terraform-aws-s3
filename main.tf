@@ -38,13 +38,8 @@ resource "aws_s3_bucket" "this" {
       mfa_delete = var.versioning_mfa_delete
   }
 
-  dynamic "logging" {
-    for_each = length(keys(var.logging)) == 0 ? [] : [var.logging]
-
-    content {
-      target_bucket = logging.value.target_bucket
-      target_prefix = lookup(logging.value, "target_prefix", null)
-    }
+  logging {
+      target_bucket = var.logging_bucket
   }
 
   dynamic "lifecycle_rule" {
