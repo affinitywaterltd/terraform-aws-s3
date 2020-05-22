@@ -33,7 +33,7 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
-  versioning = {
+  versioning {
       enabled    = var.versioning_enabled
       mfa_delete = var.versioning_mfa_delete
   }
