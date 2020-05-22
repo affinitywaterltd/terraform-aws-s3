@@ -55,7 +55,7 @@ variable "force_destroy" {
 variable "acceleration_status" {
   description = "(Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended."
   type        = string
-  default     = "suspended"
+  default     = "Suspended"
 }
 
 variable "region" {
