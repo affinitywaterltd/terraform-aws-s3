@@ -4,7 +4,7 @@ data "aws_caller_identity" "current" {}
 locals {
     default_logging_config = {
         target_bucket = var.default_logging_bucket
-        target_prefix = "${data.aws_caller_identity.current.account_id}/${var.bucket}/"
+        target_prefix = "s3accesslogs/${data.aws_caller_identity.current.account_id}/${var.bucket}/"
     }
 }
 
@@ -59,7 +59,7 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "logging" {
-    for_each = var.default_logging_enabled == false ? [var.custom_logging_config] : []
+    for_each = (var.default_logging_enabled == false && length(keys(var.cors_rule)) != 0) ? [var.custom_logging_config] : []
 
     content {
       target_bucket = custom_logging_config.value.target_bucket
