@@ -50,8 +50,8 @@ resource "aws_s3_bucket" "this" {
     for_each = local.default_logging_config
 
     content {
-      target_bucket = default_logging_config.target_bucket
-      target_prefix = lookup(default_logging_config, "target_prefix", null)
+      target_bucket = local.default_logging_config.target_bucket
+      target_prefix = lookup(local.default_logging_config, "target_prefix", null)
     }
   }
 
