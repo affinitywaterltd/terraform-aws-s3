@@ -97,7 +97,7 @@ variable "versioning_mfa_delete" {
 variable "default_logging_enabled" {
   description = "Determines if a default logging config is applied"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "default_logging_bucket" {
