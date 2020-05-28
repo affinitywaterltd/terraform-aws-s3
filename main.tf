@@ -46,7 +46,8 @@ resource "aws_s3_bucket" "this" {
   }
 
   dynamic "logging" {
-    for_each = var.default_logging_enabled == "true" ? [local.default_logging_config] : []
+    #for_each = var.default_logging_enabled == "true" ? [local.default_logging_config] : []
+    for_each = local.default_logging_config
 
     content {
       target_bucket = default_logging_config.value.target_bucket
@@ -190,6 +191,7 @@ resource "aws_s3_bucket" "this" {
         }
     }
   }
+
 }
 
 resource "aws_s3_bucket_policy" "this" {
