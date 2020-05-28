@@ -1,9 +1,13 @@
+data "aws_caller_identity" "current" {}
+
+
 locals {
     default_logging_config = {
         target_bucket = var.default_logging_bucket
-        target_prefix = "testprefix/"
+        target_prefix = "${data.aws_caller_identity.current.account_id}/${var.bucket}/"
     }
 }
+
 
 resource "aws_s3_bucket" "this" {
   count = var.create_bucket ? 1 : 0
@@ -47,7 +51,6 @@ resource "aws_s3_bucket" "this" {
 
   dynamic "logging" {
     for_each = var.default_logging_enabled == true ? [local.default_logging_config] : []
-    #for_each = local.default_logging_config
 
     content {
       target_bucket = local.default_logging_config.target_bucket
