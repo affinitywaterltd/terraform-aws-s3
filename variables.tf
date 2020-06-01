@@ -158,3 +158,9 @@ variable "restrict_public_buckets" {
   type        = bool
   default     = true
 }
+
+variable "grant" {
+  description = "Map containing all ACL rules."
+  type        = any # should be `map`, but it produces an error "all map elements must have the same type"
+  default     = {}
+}

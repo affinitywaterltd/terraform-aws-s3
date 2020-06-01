@@ -14,7 +14,7 @@ resource "aws_s3_bucket" "this" {
 
   bucket              = var.bucket
   bucket_prefix       = var.bucket_prefix
-  acl                 = var.acl
+  acl                 = length(keys(var.grant)) == 0 ? var.acl : null
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
@@ -41,6 +41,16 @@ resource "aws_s3_bucket" "this" {
       allowed_headers = lookup(cors_rule.value, "allowed_headers", null)
       expose_headers  = lookup(cors_rule.value, "expose_headers", null)
       max_age_seconds = lookup(cors_rule.value, "max_age_seconds", null)
+    }
+  }
+
+  dynamic "grant" {
+    for_each = length(keys(var.grant)) == 0 ? [] : [var.grant]
+
+    content {
+      id          = lookup(grant.value, "id", null)
+      type        = lookup(grant.value, "type", null)
+      permissions = lookup(grant.value, "permissions", null)
     }
   }
 
