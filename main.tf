@@ -51,6 +51,7 @@ resource "aws_s3_bucket" "this" {
       id          = lookup(grant.value, "id", null)
       type        = lookup(grant.value, "type", null)
       permissions = lookup(grant.value, "permissions", null)
+      uri = lookup(grant.value, "uri", null)
     }
   }
 
