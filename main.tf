@@ -14,7 +14,7 @@ resource "aws_s3_bucket" "this" {
 
   bucket              = var.bucket
   bucket_prefix       = var.bucket_prefix
-  acl                 = length(var.grant) == 0 ? var.acl : null
+  acl                 = var.grant == [] ? var.acl : null
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
