@@ -89,7 +89,7 @@ resource "aws_s3_bucket" "this" {
       target_prefix = lookup(custom_logging_config.value, "target_prefix", null)
     }
   }
-
+/*
   #
   # Default Lifecycle Rules
   #
@@ -130,7 +130,7 @@ resource "aws_s3_bucket" "this" {
         }
       }
     }
-  }
+  }*/
 
   #
   # Lifecycle Rules
