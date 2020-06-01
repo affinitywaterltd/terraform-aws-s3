@@ -108,23 +108,11 @@ resource "aws_s3_bucket" "this" {
       abort_incomplete_multipart_upload_days = lookup(local.default_lifecycle_rule.value, "abort_incomplete_multipart_upload_days", null)
       enabled                                = local.default_lifecycle_rule.value.enabled
 
-      # Max 1 block - expiration
-      dynamic "expiration" {
-        for_each = length(keys(lookup(local.default_lifecycle_rule.value, "expiration", {}))) == 0 ? [] : [lookup(local.default_lifecycle_rule.value, "expiration", {})]
-
-        content {
-          date                         = lookup(expiration.value, "date", null)
-          days                         = lookup(expiration.value, "days", null)
-          expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
-        }
-      }
-
       # Several blocks - transition
       dynamic "transition" {
         for_each = lookup(local.default_lifecycle_rule.value, "transition", [])
 
         content {
-          date          = lookup(transition.value, "date", null)
           days          = lookup(transition.value, "days", null)
           storage_class = transition.value.storage_class
         }
