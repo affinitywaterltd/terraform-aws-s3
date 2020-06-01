@@ -124,12 +124,6 @@ variable "default_lifecycle_rule_enabled" {
   default     = true
 }
 
-variable "default_lifecycle_rule" {
-  description = "List of maps containing configuration of default object lifecycle management."
-  type        = any
-  default     = []
-}
-
 variable "replication_configuration" {
   description = "Map containing cross-region replication configuration."
   type        = any
@@ -184,7 +178,7 @@ variable "grant" {
 # Defines local variables used for default behaviours
 #
 locals {
-/*
+
   default_lifecycle_rule = [
     {
       id      = "default_lifecycle_rule"
@@ -211,5 +205,5 @@ locals {
         days = 365
       }
     }
-  ]*/
+  ]
 }
