@@ -101,40 +101,31 @@ resource "aws_s3_bucket" "this" {
   # Default Lifecycle Rules
   #
   dynamic "lifecycle_rule" {
-    for_each = var.default_lifecycle_rule_enabled == true ? local.default_lifecycle_rule : []
+    for_each = var.default_lifecycle_rule_enabled == true ? [1] : []
 
     content {
-      id                                     = lookup(local.default_lifecycle_rule.value, "id", null)
-      abort_incomplete_multipart_upload_days = lookup(local.default_lifecycle_rule.value, "abort_incomplete_multipart_upload_days", null)
-      enabled                                = local.default_lifecycle_rule.value.enabled
+      id                                     = "default_lifecycle_rule"
+      abort_incomplete_multipart_upload_days = 30
+      enabled                                = var.default_lifecycle_rule_enabled
 
-      # Several blocks - transition
-      dynamic "transition" {
-        for_each = lookup(local.default_lifecycle_rule.value, "transition", [])
-
-        content {
-          days          = lookup(transition.value, "days", null)
-          storage_class = transition.value.storage_class
-        }
+      transition {
+        days          = 30
+        storage_class = "ONEZONE_IA"
+      }
+      transition {
+        days          = 180
+        storage_class = "GLACIER"
       }
 
       # Max 1 block - noncurrent_version_expiration
-      dynamic "noncurrent_version_expiration" {
-        for_each = length(keys(lookup(local.default_lifecycle_rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(local.default_lifecycle_rule.value, "noncurrent_version_expiration", {})]
-
-        content {
-          days = lookup(noncurrent_version_expiration.value, "days", null)
-        }
+      noncurrent_version_expiration {
+        days = 180
       }
 
       # Several blocks - noncurrent_version_transition
-      dynamic "noncurrent_version_transition" {
-        for_each = lookup(local.default_lifecycle_rule.value, "noncurrent_version_transition", [])
-
-        content {
-          days          = lookup(noncurrent_version_transition.value, "days", null)
-          storage_class = noncurrent_version_transition.value.storage_class
-        }
+      noncurrent_version_transition {
+        days          = 30
+        storage_class = "ONEZONE_IA"
       }
     }
   }
