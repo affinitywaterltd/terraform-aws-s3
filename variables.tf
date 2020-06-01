@@ -112,7 +112,7 @@ variable "custom_logging_config" {
   default     = {}
 }
 
-variable "custom_lifecycle_rule" {
+variable "lifecycle_rule" {
   description = "List of maps containing configuration of object lifecycle management."
   type        = any
   default     = []
