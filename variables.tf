@@ -183,12 +183,12 @@ variable "grant" {
 # Defines local variables used for default behaviours
 #
 locals {
-    default_logging_config = {
-        target_bucket = var.default_logging_bucket
-        target_prefix = "accesslogs/AWSLogs/${data.aws_caller_identity.current.account_id}/s3/${var.bucket}/"
-    }
+  default_logging_config = {
+      target_bucket = var.default_logging_bucket
+      target_prefix = "accesslogs/AWSLogs/${data.aws_caller_identity.current.account_id}/s3/${var.bucket}/"
+  }
 
-    default_lifecycle_rule = [
+  default_lifecycle_rule = [
     {
       id      = "default_lifecycle_rule"
       abort_incomplete_multipart_upload_days = 30

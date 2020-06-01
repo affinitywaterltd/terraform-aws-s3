@@ -94,7 +94,7 @@ resource "aws_s3_bucket" "this" {
   # Default Lifecycle Rules
   #
   dynamic "lifecycle_rule" {
-    for_each = local.default_lifecycle_rule
+    for_each = var.default_lifecycle_rule_enabled == true ? [local.default_lifecycle_rule] : []
 
     content {
       id                                     = lookup(local.default_lifecycle_rule.value, "id", null)
@@ -136,7 +136,7 @@ resource "aws_s3_bucket" "this" {
   # Lifecycle Rules
   #
   dynamic "lifecycle_rule" {
-    for_each = var.custom_lifecycle_rule
+    for_each = var.default_lifecycle_rule_enabled == false ? [local.custom_lifecycle_rule] : []
 
     content {
       id                                     = lookup(custom_lifecycle_rule.value, "id", null)
