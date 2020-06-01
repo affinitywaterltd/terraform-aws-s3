@@ -1,13 +1,6 @@
 data "aws_caller_identity" "current" {}
 
 
-locals {
-    default_logging_config = {
-        target_bucket = var.default_logging_bucket
-        target_prefix = "accesslogs/AWSLogs/${data.aws_caller_identity.current.account_id}/s3/${var.bucket}/"
-    }
-}
-
 
 resource "aws_s3_bucket" "this" {
   count = var.create_bucket ? 1 : 0
@@ -21,6 +14,10 @@ resource "aws_s3_bucket" "this" {
   region              = var.region
   request_payer       = var.request_payer
 
+
+  #
+  # Static Hosted Website
+  #
   dynamic "website" {
     for_each = length(keys(var.website)) == 0 ? [] : [var.website]
 
@@ -32,6 +29,9 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # Cross-Origin Resource Sharing
+  #
   dynamic "cors_rule" {
     for_each = length(keys(var.cors_rule)) == 0 ? [] : [var.cors_rule]
 
@@ -44,6 +44,9 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # ACL Grant Permissions
+  #
   dynamic "grant" {
     for_each = var.grant
 
@@ -55,11 +58,17 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # Versioning
+  #
   versioning {
       enabled    = var.versioning_enabled
       mfa_delete = var.versioning_mfa_delete
   }
 
+  #
+  # Default Logging
+  #
   dynamic "logging" {
     for_each = var.default_logging_enabled == true ? [local.default_logging_config] : []
 
@@ -69,6 +78,9 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # Custom Logging
+  #
   dynamic "logging" {
     for_each = (var.default_logging_enabled == false && length(keys(var.cors_rule)) != 0) ? [var.custom_logging_config] : []
 
@@ -78,19 +90,64 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # Default Lifecycle Rules
+  #
   dynamic "lifecycle_rule" {
-    for_each = var.lifecycle_rule
+    for_each = local.default_lifecycle_rule
 
     content {
-      id                                     = lookup(lifecycle_rule.value, "id", null)
-      prefix                                 = lookup(lifecycle_rule.value, "prefix", null)
-      tags                                   = lookup(lifecycle_rule.value, "tags", null)
-      abort_incomplete_multipart_upload_days = lookup(lifecycle_rule.value, "abort_incomplete_multipart_upload_days", null)
-      enabled                                = lifecycle_rule.value.enabled
+      id                                     = lookup(local.default_lifecycle_rule.value, "id", null)
+      abort_incomplete_multipart_upload_days = lookup(local.default_lifecycle_rule.value, "abort_incomplete_multipart_upload_days", null)
+      enabled                                = local.default_lifecycle_rule.value.enabled
+
+      # Several blocks - transition
+      dynamic "transition" {
+        for_each = lookup(local.default_lifecycle_rule.value, "transition", [])
+
+        content {
+          days          = lookup(transition.value, "days", null)
+          storage_class = transition.value.storage_class
+        }
+      }
+
+      # Max 1 block - noncurrent_version_expiration
+      dynamic "noncurrent_version_expiration" {
+        for_each = length(keys(lookup(local.default_lifecycle_rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(local.default_lifecycle_rule.value, "noncurrent_version_expiration", {})]
+
+        content {
+          days = lookup(noncurrent_version_expiration.value, "days", null)
+        }
+      }
+
+      # Several blocks - noncurrent_version_transition
+      dynamic "noncurrent_version_transition" {
+        for_each = lookup(local.default_lifecycle_rule.value, "noncurrent_version_transition", [])
+
+        content {
+          days          = lookup(noncurrent_version_transition.value, "days", null)
+          storage_class = noncurrent_version_transition.value.storage_class
+        }
+      }
+    }
+  }
+
+  #
+  # Lifecycle Rules
+  #
+  dynamic "lifecycle_rule" {
+    for_each = var.custom_lifecycle_rule
+
+    content {
+      id                                     = lookup(custom_lifecycle_rule.value, "id", null)
+      prefix                                 = lookup(custom_lifecycle_rule.value, "prefix", null)
+      tags                                   = lookup(custom_lifecycle_rule.value, "tags", null)
+      abort_incomplete_multipart_upload_days = lookup(custom_lifecycle_rule.value, "abort_incomplete_multipart_upload_days", null)
+      enabled                                = custom_lifecycle_rule.value.enabled
 
       # Max 1 block - expiration
       dynamic "expiration" {
-        for_each = length(keys(lookup(lifecycle_rule.value, "expiration", {}))) == 0 ? [] : [lookup(lifecycle_rule.value, "expiration", {})]
+        for_each = length(keys(lookup(custom_lifecycle_rule.value, "expiration", {}))) == 0 ? [] : [lookup(custom_lifecycle_rule.value, "expiration", {})]
 
         content {
           date                         = lookup(expiration.value, "date", null)
@@ -101,7 +158,7 @@ resource "aws_s3_bucket" "this" {
 
       # Several blocks - transition
       dynamic "transition" {
-        for_each = lookup(lifecycle_rule.value, "transition", [])
+        for_each = lookup(custom_lifecycle_rule.value, "transition", [])
 
         content {
           date          = lookup(transition.value, "date", null)
@@ -112,7 +169,7 @@ resource "aws_s3_bucket" "this" {
 
       # Max 1 block - noncurrent_version_expiration
       dynamic "noncurrent_version_expiration" {
-        for_each = length(keys(lookup(lifecycle_rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(lifecycle_rule.value, "noncurrent_version_expiration", {})]
+        for_each = length(keys(lookup(custom_lifecycle_rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [lookup(custom_lifecycle_rule.value, "noncurrent_version_expiration", {})]
 
         content {
           days = lookup(noncurrent_version_expiration.value, "days", null)
@@ -121,7 +178,7 @@ resource "aws_s3_bucket" "this" {
 
       # Several blocks - noncurrent_version_transition
       dynamic "noncurrent_version_transition" {
-        for_each = lookup(lifecycle_rule.value, "noncurrent_version_transition", [])
+        for_each = lookup(custom_lifecycle_rule.value, "noncurrent_version_transition", [])
 
         content {
           days          = lookup(noncurrent_version_transition.value, "days", null)
@@ -131,6 +188,9 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # Cross-Region Replciation and Same-Region Replication (CRR and SRR)
+  #
  # Max 1 block - replication_configuration
   dynamic "replication_configuration" {
     for_each = length(keys(var.replication_configuration)) == 0 ? [] : [var.replication_configuration]
@@ -196,6 +256,9 @@ resource "aws_s3_bucket" "this" {
     }
   }
 
+  #
+  # Server Side Encryption
+  #
   # Max 1 block - server_side_encryption_configuration
   server_side_encryption_configuration {
     rule {

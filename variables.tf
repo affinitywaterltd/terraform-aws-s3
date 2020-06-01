@@ -112,8 +112,20 @@ variable "custom_logging_config" {
   default     = {}
 }
 
-variable "lifecycle_rule" {
+variable "custom_lifecycle_rule" {
   description = "List of maps containing configuration of object lifecycle management."
+  type        = any
+  default     = []
+}
+
+variable "default_lifecycle_rule_enabled" {
+  description = "Determines if a default lifecycle config is applied"
+  type        = bool
+  default     = true
+}
+
+variable "default_lifecycle_rule" {
+  description = "List of maps containing configuration of default object lifecycle management."
   type        = any
   default     = []
 }
@@ -163,4 +175,44 @@ variable "grant" {
   description = "Map containing all ACL rules."
   type        = any # should be `map`, but it produces an error "all map elements must have the same type"
   default     = []
+}
+
+
+
+#
+# Defines local variables used for default behaviours
+#
+locals {
+    default_logging_config = {
+        target_bucket = var.default_logging_bucket
+        target_prefix = "accesslogs/AWSLogs/${data.aws_caller_identity.current.account_id}/s3/${var.bucket}/"
+    }
+
+    default_lifecycle_rule = [
+    {
+      id      = "default_lifecycle_rule"
+      abort_incomplete_multipart_upload_days = 30
+      enabled = true
+
+      transition = [
+        {
+          days          = 30
+          storage_class = "ONEZONE_IA"
+        }, 
+        {
+          days          = 180
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_transition = {
+        days = 30
+        storage_class = "ONEZONE_IA"
+      }
+
+      noncurrent_version_expiration = {
+        days = 365
+      }
+    }
+  ]
 }
