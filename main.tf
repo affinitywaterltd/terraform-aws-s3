@@ -112,10 +112,10 @@ resource "aws_s3_bucket" "this" {
         days          = 30
         storage_class = "ONEZONE_IA"
       }
-      transition {
+      /*transition {
         days          = 180
         storage_class = "GLACIER"
-      }
+      }*/
 
       # Max 1 block - noncurrent_version_expiration
       noncurrent_version_expiration {
