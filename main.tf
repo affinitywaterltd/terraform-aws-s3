@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "this" {
   tags                = var.tags
   force_destroy       = var.force_destroy
   acceleration_status = var.acceleration_status
-  region              = var.region
+  #region              = var.region deprecated in v3.0.0 of the AWS provider
   request_payer       = var.request_payer
 
 
