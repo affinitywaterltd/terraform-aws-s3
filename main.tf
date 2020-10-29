@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "this" {
   acl                 = var.grant == [] ? var.acl : null
   tags                = var.tags
   force_destroy       = var.force_destroy
-  acceleration_status = var.acceleration_status
+  acceleration_status = length(keys(var.website)) == 0 ? var.acceleration_status : null
   #region              = var.region deprecated in v3.0.0 of the AWS provider
   request_payer       = var.request_payer
 
