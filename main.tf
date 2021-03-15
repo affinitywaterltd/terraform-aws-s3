@@ -92,8 +92,8 @@ resource "aws_s3_bucket" "this" {
     for_each = (var.default_logging_enabled == false && length(keys(var.custom_logging_config)) != 0) ? [var.custom_logging_config] : []
 
     content {
-      target_bucket = custom_logging_config.value.target_bucket
-      target_prefix = lookup(custom_logging_config.value, "target_prefix", null)
+      target_bucket = var.custom_logging_config.target_bucket
+      target_prefix = lookup(var.custom_logging_config.value, "target_prefix", null)
     }
   }
 
