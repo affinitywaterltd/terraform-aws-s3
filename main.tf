@@ -93,7 +93,7 @@ resource "aws_s3_bucket" "this" {
 
     content {
       target_bucket = var.custom_logging_config.target_bucket
-      target_prefix = lookup(var.custom_logging_config.value, "target_prefix", null)
+      target_prefix = lookup(var.custom_logging_config, "target_prefix", null)
     }
   }
 
