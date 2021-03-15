@@ -89,7 +89,7 @@ resource "aws_s3_bucket" "this" {
   # Custom Logging
   #
   dynamic "logging" {
-    for_each = (var.default_logging_enabled == false && length(keys(var.cors_rule)) != 0) ? [var.custom_logging_config] : []
+    for_each = (var.default_logging_enabled == false && length(keys(var.custom_logging_config)) != 0) ? [var.custom_logging_config] : []
 
     content {
       target_bucket = custom_logging_config.value.target_bucket
