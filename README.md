@@ -2,7 +2,7 @@
 
 Terraform module which creates S3 resources on AWS.
 
-This module focuses on S3, S3 Bucket Polocy and IAM.
+This module focuses on S3, S3 Bucket Policy and IAM.
 
 * [S3 Bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket)
 * [S3 Bucket Policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy)
