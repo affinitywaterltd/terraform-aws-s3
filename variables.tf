@@ -58,11 +58,11 @@ variable "acceleration_status" {
   default     = "Suspended"
 }
 
-variable "region" {
+/*variable "region" {
   description = "(Optional) If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee."
   type        = string
   default     = "eu-west-1"
-}
+}*/
 
 variable "request_payer" {
   description = "(Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information."
@@ -170,40 +170,4 @@ variable "grant" {
   description = "Map containing all ACL rules."
   type        = any # should be `map`, but it produces an error "all map elements must have the same type"
   default     = []
-}
-
-
-
-#
-# Defines local variables used for default behaviours
-#
-locals {
-
-  default_lifecycle_rule = [
-    {
-      id      = "default_lifecycle_rule"
-      abort_incomplete_multipart_upload_days = 30
-      enabled = true
-
-      transition = [
-        {
-          days          = 30
-          storage_class = "ONEZONE_IA"
-        }, 
-        {
-          days          = 180
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_transition = {
-        days = 30
-        storage_class = "ONEZONE_IA"
-      }
-
-      noncurrent_version_expiration = {
-        days = 365
-      }
-    }
-  ]
 }
